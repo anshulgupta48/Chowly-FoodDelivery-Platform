@@ -64,9 +64,7 @@ export default function SignInScreen() {
           toast.success(
             `Welcome back, ${response.data.user.name.split(' ')[0]}`,
           );
-          router.replace(
-            landingRouteFor(response.data.user.role, response.data.hasAddress),
-          );
+          router.replace(landingRouteFor(response.data.hasAddress));
         },
         onError: (error) => {
           toast.error('We could not sign you in', {

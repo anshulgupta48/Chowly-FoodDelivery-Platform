@@ -17,16 +17,18 @@ export const registerUser = async (input: RegisterInput): Promise<AuthResult> =>
   }
 
   // Only ever a customer here; drivers and admins are created in the backoffice.
-  const user = await UserModel.create({
+  const user = new UserModel({
     email: input.email.toLowerCase(),
     name: input.name,
     password: input.password,
     phone: input.phone,
     role: "customer",
   });
+  const accessToken = issueToken(user);
+  await user.save();
 
   // A brand new account cannot have an address yet.
-  return { accessToken: issueToken(user), defaultAddress: null, hasAddress: false, user };
+  return { accessToken, defaultAddress: null, hasAddress: false, user };
 };
 
 export const loginUser = async (input: LoginInput): Promise<AuthResult> => {

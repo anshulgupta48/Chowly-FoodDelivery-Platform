@@ -10,8 +10,8 @@ import { getAccessToken } from './token-storage';
  * proves it. A rejected token is cleared by the axios interceptor, so a 401
  * here resolves to signed-out rather than a retry loop.
  */
-/** Where a signed-in account belongs. Riders never land in the customer app. */
-export const landingRouteFor = (role?: string, hasAddress?: boolean) => {
+/** Where a signed-in customer belongs. */
+export const landingRouteFor = (hasAddress?: boolean) => {
   return hasAddress ? ('/home' as const) : ('/location' as const);
 };
 
@@ -39,7 +39,7 @@ export const useSession = () => {
     isSignedIn: Boolean(tokenQuery.data) && Boolean(userQuery.data),
     role: user?.role,
     isDriver: user?.role === 'driver',
-    landingRoute: landingRouteFor(user?.role, userQuery.data?.data.hasAddress),
+    landingRoute: landingRouteFor(userQuery.data?.data.hasAddress),
     hasAddress: userQuery.data?.data.hasAddress ?? false,
     defaultAddress: userQuery.data?.data.defaultAddress ?? null,
     user: userQuery.data?.data.user,

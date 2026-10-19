@@ -1,16 +1,21 @@
 import axios, { AxiosError, AxiosInstance } from 'axios';
+import Constants from 'expo-constants';
+import { Platform } from 'react-native';
 import {
   clearAccessToken,
   getAccessToken,
 } from '@/features/auth/token-storage';
 
 /**
- * Set EXPO_PUBLIC_API_URL in mobile/.env. On an Android emulator run
- * `adb reverse tcp:8000 tcp:8000` so localhost reaches the API on your machine;
- * on a physical device use your machine's LAN IP.
+ * EXPO_PUBLIC_API_URL overrides the development default. Native Expo clients
+ * use the Metro host so localhost doesn't incorrectly point back to the device.
  */
+const developmentHost = Constants.expoConfig?.hostUri?.split(':')[0];
 const baseURL =
-  process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8000/api/v1';
+  process.env.EXPO_PUBLIC_API_URL?.trim() ||
+  (__DEV__ && Platform.OS !== 'web' && developmentHost
+    ? `http://${developmentHost}:8000/api/v1`
+    : 'http://localhost:8000/api/v1');
 
 /** The shape the API's error handler returns for every failure. */
 export type ApiErrorBody = {

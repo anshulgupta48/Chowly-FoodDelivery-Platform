@@ -36,10 +36,14 @@ app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 app.use(cookieParser());
 
-if (Env.CORS_ORIGIN) {
+const corsOrigins = Env.CORS_ORIGIN.split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+if (corsOrigins.length > 0 || !isProduction) {
   app.use(
     cors({
-      origin: Env.CORS_ORIGIN.split(',').map((origin) => origin.trim()),
+      origin: corsOrigins.length > 0 ? corsOrigins : true,
       credentials: true,
     }),
   );

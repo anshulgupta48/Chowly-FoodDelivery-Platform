@@ -10,7 +10,7 @@ import { useSession } from './use-session';
  * route whose navigator no longer exists, which wedges the app on a blank screen.
  */
 export const useProtectedRoute = () => {
-  const { isDriver, isResolving, isSignedIn, landingRoute } = useSession();
+  const { isResolving, isSignedIn, landingRoute } = useSession();
   const segments = useSegments();
   const router = useRouter();
 
@@ -30,15 +30,6 @@ export const useProtectedRoute = () => {
 
     if (isSignedIn && inAuthGroup) {
       router.replace(landingRoute);
-      return;
     }
-
-    // Roles do not share screens: a rider in the customer app (or the reverse)
-    // is sent to their own side rather than left on a screen the API will refuse.
-    const inDriverGroup = group === '(driver)';
-
-    if (isSignedIn && isDriver !== inDriverGroup) {
-      router.replace(landingRoute);
-    }
-  }, [isDriver, isResolving, isSignedIn, landingRoute, router, segments]);
+  }, [isResolving, isSignedIn, landingRoute, router, segments]);
 };

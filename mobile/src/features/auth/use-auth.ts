@@ -24,6 +24,16 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: loginMutationFn,
     onSuccess: async (response) => {
+      await Promise.all([
+        queryClient.cancelQueries({
+          queryKey: queryKeys.accessToken,
+          exact: true,
+        }),
+        queryClient.cancelQueries({
+          queryKey: queryKeys.currentUser,
+          exact: true,
+        }),
+      ]);
       await setAccessToken(response.data.accessToken);
       queryClient.setQueryData(
         queryKeys.accessToken,
@@ -52,6 +62,16 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: registerMutationFn,
     onSuccess: async (response) => {
+      await Promise.all([
+        queryClient.cancelQueries({
+          queryKey: queryKeys.accessToken,
+          exact: true,
+        }),
+        queryClient.cancelQueries({
+          queryKey: queryKeys.currentUser,
+          exact: true,
+        }),
+      ]);
       await setAccessToken(response.data.accessToken);
       queryClient.setQueryData(
         queryKeys.accessToken,

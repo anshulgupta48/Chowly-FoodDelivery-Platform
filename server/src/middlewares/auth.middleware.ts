@@ -1,7 +1,31 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import passport from 'passport';
-import { UserDocument, UserRole } from '../models/user.model';
+import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
+import { Env } from '../config/env.config';
+import { ACCESS_TOKEN_COOKIE } from '../utils/cookie';
+import { UserDocument, UserModel, UserRole } from '../models/user.model';
 import { ForbiddenException, UnauthorizedException } from '../utils/app-error';
+
+passport.use(
+  'jwt',
+  new JwtStrategy(
+    {
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+        (request) => request.cookies?.[ACCESS_TOKEN_COOKIE] ?? null,
+      ]),
+      secretOrKey: Env.JWT_SECRET,
+    },
+    async (payload: { userId: string }, done) => {
+      try {
+        const user = await UserModel.findById(payload.userId).exec();
+        return done(null, user?.isActive ? user : false);
+      } catch (error) {
+        return done(error);
+      }
+    },
+  ),
+);
 
 /** Verifies the JWT from either transport and puts the user on the request. */
 export const requireAuth: RequestHandler = (request, response, next) => {
